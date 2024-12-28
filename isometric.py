@@ -1,7 +1,7 @@
 import pygame
 from pygame.math import Vector2 as vec2, Vector3 as vec3
 
-from math import floor, sin, pi
+from math import floor, sin, copysign
 
 from constants import *
 from spritesheet import spritesheet
@@ -130,29 +130,60 @@ class IsoDie(Iso):
                         color = self._sample_uv(sample.b, self.faces[self.layout.right])
                         self.tex.set_at((i,j), (max(color.r-50, 1), max(color.g-50, 1), max(color.b-50, 1), 255))
     
-    def update(self):
-        tapped = pygame.key.get_just_pressed()
-        moved = False
-        if tapped[pygame.K_d]:
-            self.layout.roll_left()
-            self.position.x += self.layout.bottom+1
-            moved = True
-        if tapped[pygame.K_a]:
-            self.layout.roll_right()
-            self.position.x -= self.layout.bottom+1
-            moved = True
-        if tapped[pygame.K_s]:
-            self.layout.roll_front()
-            self.position.y += self.layout.bottom+1
-            moved = True
-        if tapped[pygame.K_w]:
-            self.layout.roll_back()
-            self.position.y -= self.layout.bottom+1
-            moved = True
+    def _check_collision(self, sample: vec3, isos):
+        for iso in isos:
+            if isinstance(iso, IsoBlock) and iso.position == sample:
+                return iso.ID
+        return -1
+
+    def move_x(self, dx, isos):
+        sample = self.position + vec3(-1,0,-1)
+        step = copysign(1, dx)
+        for s in range(abs(dx)):
+            sample.x += step
+            if self._check_collision(sample, isos) == 1:
+                return
         
-        if moved:
-            self.update_tex()
-            self.gm.sounds['step'].play()
+        if self._check_collision(sample, isos) == -1:
+            return
+        
+        self.position.x += dx
+
+        self.update_tex()
+        self.gm.sounds['step'].play()
+    
+    def move_y(self, dy, isos):
+        sample = self.position + vec3(-1,0,-1)
+        step = copysign(1, dy)
+        for s in range(abs(dy)):
+            sample.y += step
+            if self._check_collision(sample, isos) == 1:
+                return
+        
+        if self._check_collision(sample, isos) == -1:
+            return
+        
+        self.position.y += dy
+
+        self.update_tex()
+        self.gm.sounds['step'].play()
+    
+    def update(self, isos):
+        tapped = pygame.key.get_just_pressed()
+        if tapped[pygame.K_d] or tapped[pygame.K_RIGHT]:
+            self.layout.roll_right()
+            self.move_x(self.layout.bottom+1, isos)
+        if tapped[pygame.K_a] or tapped[pygame.K_LEFT]:
+            self.layout.roll_left()
+            self.move_x(-(self.layout.bottom+1), isos)
+        if tapped[pygame.K_s] or tapped[pygame.K_DOWN]:
+            self.layout.roll_front()
+            self.move_y(self.layout.bottom+1, isos)
+        if tapped[pygame.K_w] or tapped[pygame.K_UP]:
+            self.layout.roll_back()
+            self.move_y(-(self.layout.bottom+1), isos)
+        
+
 
 
     def draw(self):
@@ -168,20 +199,28 @@ class Isometric:
             [
                 [0,0,23,22],  # Blue
                 [23,0,23,22], # Orange
+                [46,0,23,22], # Green/Start
+                [69,0,23,22], # Red/End
             ],
             (0,0,0)
         )
         self.size: vec2
         self.isos = []
     
-    def load_blocks(self, image_filename: str):
+    def load(self, image_filename: str):
         im = pygame.image.load(image_filename)
         self.size = vec2(im.get_size())
-        lvlarr = pygame.PixelArray(im)
         for j in range(im.get_height()):
             for i in range(im.get_width()):
-                if lvlarr[i,j] == im.map_rgb((0,0,0xFF)): self.isos.append(IsoBlock(vec3(i,j,0), 0))
-                elif lvlarr[i,j] == im.map_rgb((0xFF,0x7F,0)): self.isos.append(IsoBlock(vec3(i,j,0), 1))
+                color = im.get_at((i,j))
+                if color == (0,0,0xFF): self.isos.append(IsoBlock(vec3(i,j,0), 0))
+                elif color == (0xFF,0x7F,0): self.isos.append(IsoBlock(vec3(i,j,0), 1))
+                elif color == (0xFF,0,0): self.isos.append(IsoBlock(vec3(i,j,0), 3))
+                elif color == (0,0xFF,0):
+                    self.isos.append(IsoBlock(vec3(i,j,0), 2))
+                    # Regular die layout DieLayout(0,5,1,4,2,3)
+                    self.gm.die = IsoDie(self.gm, vec3(i+1,j,1), DieLayout(0,1,0,1,0,1))
+                    self.isos.append(self.gm.die)
 
 
 

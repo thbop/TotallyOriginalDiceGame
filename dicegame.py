@@ -21,12 +21,11 @@ class DiceGame:
         self.window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
         self.screen = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
 
+        self.die: IsoDie
         self.isometric = Isometric(self)
-        self.isometric.load_blocks('img/level.png')
+        self.isometric.load('levels/0.png')
 
         self.camera = IsoCamera(self, pygame.Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT))
-        self.die = IsoDie(self, vec3(10,10,1), DieLayout(0,1,0,1,0,1))
-        self.isometric.isos.append(self.die)
 
         self.sounds = {
             'step':pygame.mixer.Sound('sfx/step.wav'),
@@ -36,7 +35,7 @@ class DiceGame:
     
     def update(self):
         self.isometric.update()
-        self.die.update()
+        self.die.update(self.isometric.isos)
         self.camera.update()
 
     def draw(self):

@@ -1,6 +1,9 @@
 import pygame
 from pygame.math import Vector2 as vec2, Vector3 as vec3
 
+from math import floor
+
+from constants import *
 from spritesheet import spritesheet
 
 
@@ -23,9 +26,10 @@ class Iso:
     
 
 class IsoCamera(Iso):
-    def __init__(self, rect: pygame.Rect):
+    def __init__(self, gm, rect: pygame.Rect):
         super().__init__(vec3(rect.x, rect.y, 0))
-        self.size = vec2(rect.size)
+        self.rect = rect
+        self.gm = gm
     
     # Checks if an element is in view to prevent unecessary draw instructions
     def in_view(self, element: Iso) -> bool:
@@ -35,32 +39,121 @@ class IsoCamera(Iso):
                 (ISO_ELEMENT_PROJECTED_WIDTH, ISO_ELEMENT_PROJECTED_HEIGHT)
             )
         )
+    
+    def update(self):
+        die_pos = self.gm.die.project()
+        self.rect.centerx += ( die_pos.x - self.rect.centerx ) / 10
+        self.rect.centery += ( die_pos.y - self.rect.centery ) / 10
 
 
-    @property
-    def rect(self) -> pygame.Rect:
-        return pygame.Rect(
-            self.position.x,
-            self.position.y,
-            self.size.x,
-            self.size.y
-        )
-    @rect.setter
-    def rect(self, value: pygame.Rect):
-        self.position = vec3(value.x, value.y, 0)
-        self.size = vec2(value.size)
 
 class IsoBlock(Iso):
     def __init__(self, position: vec3, ID: int):
         super().__init__(position)
         self.ID = ID
+
+class DieLayout:
+    def __init__(self, top, bottom, right, left, front, back):
+        self.top = top
+        self.bottom = bottom
+        self.right = right
+        self.left = left
+        self.front = front
+        self.back = back
+
+    def copy(self, existing):
+        return DieLayout(existing.top, existing.bottom, existing.right, existing.left, existing.front, existing.back)
+    
+    def roll_front(self):
+        old = self.copy(self)
+        self.top = old.back
+        self.back = old.bottom
+        self.bottom = old.front
+        self.front = old.top
+    def roll_back(self):
+        old = self.copy(self)
+        self.top = old.front
+        self.back = old.top
+        self.bottom = old.back
+        self.front = old.bottom
+    def roll_right(self):
+        old = self.copy(self)
+        self.top = old.left
+        self.left = old.bottom
+        self.bottom = old.right
+        self.right = old.top
+    def roll_left(self):
+        old = self.copy(self)
+        self.top = old.right
+        self.left = old.top
+        self.bottom = old.left
+        self.right = old.bottom
+
+class IsoDie(Iso):
+    def __init__(self, gm, position: vec3, layout: DieLayout):
+        self.gm = gm
+        super().__init__(position)
+        self.layout = layout
+
+
+        ss = spritesheet('die.png')
+
+        self.sampler = ss.image_at([0,0,9,9])
+        self.tex = ss.image_at([0,0,9,9],(0,0,0))
+
+        self.faces = ss.images_at([
+            [0, 9,3,3], [3, 9,3,3], [6, 9,3,3],
+            [0,12,3,3], [3,12,3,3], [6,12,3,3],
+            [0,15,3,3], [3,15,3,3], [6,15,3,3],
+        ])
+        self.update_tex()
+    
+    def _sample_uv(self, value: int, sampled: pygame.Surface):
+        q = (255 - value)/5
+        uv = ( q % 3, floor(q/3) )
+        return sampled.get_at(uv)
+    
+    def update_tex(self):
+        for j in range(9):
+            for i in range(9):
+                sample = self.sampler.get_at((i,j))
+                if sample != (0,0,0) and sample != (237,237,228):
+                    if sample.r: self.tex.set_at((i,j), self._sample_uv(sample.r, self.faces[self.layout.front]))
+                    elif sample.g: self.tex.set_at((i,j), self._sample_uv(sample.g, self.faces[self.layout.top]))
+                    elif sample.b:
+                        color = self._sample_uv(sample.b, self.faces[self.layout.right])
+                        self.tex.set_at((i,j), (max(color.r-50, 1), max(color.g-50, 1), max(color.b-50, 1), 255))
+    
+    def update(self):
+        tapped = pygame.key.get_just_pressed()
+        if tapped[pygame.K_d]:
+            self.position.x += 1
+            self.layout.roll_left()
+            self.update_tex()
+        if tapped[pygame.K_a]:
+            self.position.x -= 1
+            self.layout.roll_right()
+            self.update_tex()
+        if tapped[pygame.K_s]:
+            self.position.y += 1
+            self.layout.roll_front()
+            self.update_tex()
+        if tapped[pygame.K_w]:
+            self.position.y -= 1
+            self.layout.roll_back()
+            self.update_tex()
+
+
+    def draw(self):
+        self.gm.screen.blit(self.tex, self.project() - self.gm.camera.rect.topleft + vec2(-4,3))
+
     
 
 class Isometric:
     def __init__(self, gm):
         self.gm = gm
-        ss = spritesheet('sprites.png')
-        self.block_textures = ss.images_at(
+        block_ss = spritesheet('blocks.png')
+        self.block_textures = block_ss.images_at(
             [
                 [0,0,23,22],
                 [23,0,23,22]
@@ -90,8 +183,9 @@ class Isometric:
             if self.gm.camera.in_view(iso):
                 surf: pygame.Surface = None
                 if isinstance(iso, IsoBlock):
-                    surf = self.block_textures[iso.ID]
+                    self.gm.screen.blit(self.block_textures[iso.ID], iso.project() - self.gm.camera.rect.topleft)
+
+                if isinstance(iso, IsoDie):
+                    iso.draw()
                 
-                if surf:
-                    self.gm.screen.blit(surf, iso.project() - self.gm.camera.rect.topleft)
         

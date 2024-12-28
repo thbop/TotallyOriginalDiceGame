@@ -100,7 +100,7 @@ class IsoDie(Iso):
         self.layout = layout
 
 
-        ss = spritesheet('die.png')
+        ss = spritesheet('img/die.png')
 
         self.sampler = ss.image_at([0,0,9,9])
         self.tex = ss.image_at([0,0,9,9],(0,0,0))
@@ -132,22 +132,27 @@ class IsoDie(Iso):
     
     def update(self):
         tapped = pygame.key.get_just_pressed()
+        moved = False
         if tapped[pygame.K_d]:
             self.layout.roll_left()
             self.position.x += self.layout.bottom+1
-            self.update_tex()
+            moved = True
         if tapped[pygame.K_a]:
             self.layout.roll_right()
             self.position.x -= self.layout.bottom+1
-            self.update_tex()
+            moved = True
         if tapped[pygame.K_s]:
             self.layout.roll_front()
             self.position.y += self.layout.bottom+1
-            self.update_tex()
+            moved = True
         if tapped[pygame.K_w]:
             self.layout.roll_back()
             self.position.y -= self.layout.bottom+1
+            moved = True
+        
+        if moved:
             self.update_tex()
+            self.gm.sounds['step'].play()
 
 
     def draw(self):
@@ -158,7 +163,7 @@ class IsoDie(Iso):
 class Isometric:
     def __init__(self, gm):
         self.gm = gm
-        block_ss = spritesheet('blocks.png')
+        block_ss = spritesheet('img/blocks.png')
         self.block_textures = block_ss.images_at(
             [
                 [0,0,23,22],  # Blue

@@ -8,6 +8,9 @@ from isometric import *
 
 # Initialize pygame
 pygame.init()
+pygame.mixer.init()
+
+
 
 # Base class
 class DiceGame:
@@ -19,11 +22,17 @@ class DiceGame:
         self.screen = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
 
         self.isometric = Isometric(self)
-        self.isometric.load_blocks('level.png')
+        self.isometric.load_blocks('img/level.png')
 
         self.camera = IsoCamera(self, pygame.Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT))
         self.die = IsoDie(self, vec3(10,10,1), DieLayout(0,1,0,1,0,1))
         self.isometric.isos.append(self.die)
+
+        self.sounds = {
+            'step':pygame.mixer.Sound('sfx/step.wav'),
+            'pink':pygame.mixer.Sound('sfx/pink.ogg'),
+        }
+        self.sounds['pink'].play(-1)
     
     def update(self):
         self.isometric.update()

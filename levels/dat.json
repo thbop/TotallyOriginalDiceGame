@@ -1,0 +1,35 @@
+[
+    {
+        "die_layout":[0,0,0,0,0,0],
+        "texts":[
+            {
+                "text":"WASD/Arrow keys to move",
+                "pos":[-30,-30],
+                "delay":6,
+                "follow_camera":false
+            }
+        ]
+    },
+    {
+        "die_layout":[1,1,1,1,1,1],
+        "texts":[
+            {
+                "text":"Move the number of spaces you land on",
+                "pos":[-30,-30],
+                "delay":6,
+                "follow_camera":false
+            }
+        ]
+    },
+    {
+        "die_layout":[0,1,0,1,0,1],
+        "texts":[
+            {
+                "text":"R or SPACE to reset",
+                "pos":[-30,-30],
+                "delay":6,
+                "follow_camera":false
+            }
+        ]
+    }
+]

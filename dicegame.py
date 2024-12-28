@@ -1,7 +1,9 @@
+import json
 import pygame
 from pygame.math import Vector2 as vec2
 
 from constants import *
+from text import *
 from isometric import *
 
 
@@ -21,19 +23,38 @@ class DiceGame:
         self.window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
         self.screen = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
 
-        self.die: IsoDie
-        self.isometric = Isometric(self)
-        self.isometric.load('levels/0.png')
-
-        self.camera = IsoCamera(self, pygame.Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT))
-
         self.sounds = {
             'step':pygame.mixer.Sound('sfx/step.wav'),
             'pink':pygame.mixer.Sound('sfx/pink.ogg'),
+            'type':pygame.mixer.Sound('sfx/type.wav'),
+            'reset':pygame.mixer.Sound('sfx/reset.wav'),
+            'win':pygame.mixer.Sound('sfx/win.wav'),
         }
         self.sounds['pink'].play(-1)
+
+        self.text_manager = TextManager(self)
+
+        self.die: IsoDie
+        self.isometric = Isometric(self)
+        self.load(0)
+        
+
+        self.camera = IsoCamera(self, pygame.Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT))
+    
+    def load(self, lvl):
+        with open('levels/dat.json') as f:
+            data = json.load(f)[lvl]
+        
+        self.lvl_id = lvl
+        self.isometric.load(f'levels/{self.lvl_id}.png')
+        self.die.layout = DieLayout.fromlist(data['die_layout'])
+        self.text_manager.load(data['texts'])
+
+        if self.lvl_id:
+            self.sounds['win'].play()
     
     def update(self):
+        self.text_manager.update()
         self.isometric.update()
         self.die.update(self.isometric.isos)
         self.camera.update()
@@ -43,6 +64,7 @@ class DiceGame:
 
         self.isometric.draw()
 
+        self.text_manager.draw()
 
     def run(self):
         running = True
@@ -52,6 +74,10 @@ class DiceGame:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT: # Check if window is exited
                     running = False
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_r or event.key == pygame.K_SPACE:
+                        self.isometric.load(f'levels/{self.lvl_id}.png')
+                        self.sounds['reset'].play()
             
             self.update()
             self.draw()

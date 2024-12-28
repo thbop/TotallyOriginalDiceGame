@@ -68,6 +68,9 @@ class DieLayout:
     def copy(self, existing):
         return DieLayout(existing.top, existing.bottom, existing.right, existing.left, existing.front, existing.back)
     
+    def fromlist(l):
+        return DieLayout(l[0],l[1],l[2],l[3],l[4],l[5])
+    
     def roll_front(self):
         old = self.copy(self)
         self.top = old.back
@@ -144,8 +147,11 @@ class IsoDie(Iso):
             if self._check_collision(sample, isos) == 1:
                 return
         
-        if self._check_collision(sample, isos) == -1:
+        end_collision = self._check_collision(sample, isos)
+        if end_collision == -1:
             return
+        if end_collision == 3:
+            self.gm.load(self.gm.lvl_id+1)
         
         self.position.x += dx
 
@@ -160,8 +166,11 @@ class IsoDie(Iso):
             if self._check_collision(sample, isos) == 1:
                 return
         
-        if self._check_collision(sample, isos) == -1:
+        end_collision = self._check_collision(sample, isos)
+        if end_collision == -1:
             return
+        if end_collision == 3:
+            self.gm.load(self.gm.lvl_id+1)
         
         self.position.y += dy
 
@@ -208,6 +217,7 @@ class Isometric:
         self.isos = []
     
     def load(self, image_filename: str):
+        self.isos = []
         im = pygame.image.load(image_filename)
         self.size = vec2(im.get_size())
         for j in range(im.get_height()):
@@ -219,7 +229,7 @@ class Isometric:
                 elif color == (0,0xFF,0):
                     self.isos.append(IsoBlock(vec3(i,j,0), 2))
                     # Regular die layout DieLayout(0,5,1,4,2,3)
-                    self.gm.die = IsoDie(self.gm, vec3(i+1,j,1), DieLayout(0,1,0,1,0,1))
+                    self.gm.die = IsoDie(self.gm, vec3(i+1,j,1), DieLayout(0,0,0,0,0,0))
                     self.isos.append(self.gm.die)
 
 

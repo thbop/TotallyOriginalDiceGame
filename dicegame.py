@@ -18,11 +18,11 @@ class DiceGame:
         self.window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
         self.screen = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
 
-        self.camera = IsoCamera(self, pygame.Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT))
-        self.die = IsoDie(self, vec3(10,10,1), DieLayout(0,1,2,3,4,5))
-
         self.isometric = Isometric(self)
         self.isometric.load_blocks('level.png')
+
+        self.camera = IsoCamera(self, pygame.Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT))
+        self.die = IsoDie(self, vec3(10,10,1), DieLayout(0,1,0,1,0,1))
         self.isometric.isos.append(self.die)
     
     def update(self):
@@ -31,7 +31,7 @@ class DiceGame:
         self.camera.update()
 
     def draw(self):
-        self.screen.fill((0,0,0)) # Clear screen
+        self.screen.fill((12,13,20)) # Clear screen
 
         self.isometric.draw()
 

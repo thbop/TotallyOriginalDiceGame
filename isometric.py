@@ -1,7 +1,7 @@
 import pygame
 from pygame.math import Vector2 as vec2, Vector3 as vec3
 
-from math import floor
+from math import floor, sin, pi
 
 from constants import *
 from spritesheet import spritesheet
@@ -30,6 +30,7 @@ class IsoCamera(Iso):
         super().__init__(vec3(rect.x, rect.y, 0))
         self.rect = rect
         self.gm = gm
+
     
     # Checks if an element is in view to prevent unecessary draw instructions
     def in_view(self, element: Iso) -> bool:
@@ -42,8 +43,11 @@ class IsoCamera(Iso):
     
     def update(self):
         die_pos = self.gm.die.project()
+
         self.rect.centerx += ( die_pos.x - self.rect.centerx ) / 10
         self.rect.centery += ( die_pos.y - self.rect.centery ) / 10
+
+
 
 
 
@@ -118,7 +122,9 @@ class IsoDie(Iso):
             for i in range(9):
                 sample = self.sampler.get_at((i,j))
                 if sample != (0,0,0) and sample != (237,237,228):
-                    if sample.r: self.tex.set_at((i,j), self._sample_uv(sample.r, self.faces[self.layout.front]))
+                    if sample.r:
+                        color = self._sample_uv(sample.r, self.faces[self.layout.front])
+                        self.tex.set_at((i,j), (max(color.r-10, 1), max(color.g-10, 1), max(color.b-10, 1), 255))
                     elif sample.g: self.tex.set_at((i,j), self._sample_uv(sample.g, self.faces[self.layout.top]))
                     elif sample.b:
                         color = self._sample_uv(sample.b, self.faces[self.layout.right])
@@ -127,20 +133,20 @@ class IsoDie(Iso):
     def update(self):
         tapped = pygame.key.get_just_pressed()
         if tapped[pygame.K_d]:
-            self.position.x += 1
             self.layout.roll_left()
+            self.position.x += self.layout.bottom+1
             self.update_tex()
         if tapped[pygame.K_a]:
-            self.position.x -= 1
             self.layout.roll_right()
+            self.position.x -= self.layout.bottom+1
             self.update_tex()
         if tapped[pygame.K_s]:
-            self.position.y += 1
             self.layout.roll_front()
+            self.position.y += self.layout.bottom+1
             self.update_tex()
         if tapped[pygame.K_w]:
-            self.position.y -= 1
             self.layout.roll_back()
+            self.position.y -= self.layout.bottom+1
             self.update_tex()
 
 
@@ -155,8 +161,8 @@ class Isometric:
         block_ss = spritesheet('blocks.png')
         self.block_textures = block_ss.images_at(
             [
-                [0,0,23,22],
-                [23,0,23,22]
+                [0,0,23,22],  # Blue
+                [23,0,23,22], # Orange
             ],
             (0,0,0)
         )

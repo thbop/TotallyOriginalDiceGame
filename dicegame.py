@@ -65,6 +65,7 @@ class DiceGame:
         self.isometric.draw()
 
         self.text_manager.draw()
+        self.text_manager.blit(f'LEVEL:{self.lvl_id}', vec2(5,5))
 
     def run(self):
         running = True

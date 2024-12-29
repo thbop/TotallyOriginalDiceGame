@@ -3,7 +3,7 @@
         "die_layout":[0,0,0,0,0,0],
         "texts":[
             {
-                "text":"WASD/Arrow keys to move",
+                "text":"WASD/ARROW KEYS TO MOVE",
                 "pos":[-30,-30],
                 "delay":6,
                 "follow_camera":false
@@ -14,7 +14,24 @@
         "die_layout":[1,1,1,1,1,1],
         "texts":[
             {
-                "text":"Move the number of spaces you land on",
+                "text":"MOVE THE NUMBER OF SPACES",
+                "pos":[-30,-30],
+                "delay":6,
+                "follow_camera":false
+            },
+            {
+                "text":"YOUR DIE ROLLS ONTO",
+                "pos":[-30,-22],
+                "delay":6,
+                "follow_camera":false
+            }
+        ]
+    },
+    {
+        "die_layout":[0,1,0,1,0,1],
+        "texts":[
+            {
+                "text":"TWOS AND ONES!!!",
                 "pos":[-30,-30],
                 "delay":6,
                 "follow_camera":false
@@ -25,7 +42,7 @@
         "die_layout":[0,1,0,1,0,1],
         "texts":[
             {
-                "text":"R or SPACE to reset",
+                "text":"R OR SPACE TO RESET",
                 "pos":[-30,-30],
                 "delay":6,
                 "follow_camera":false

@@ -47,19 +47,17 @@ class TextManager:
                 self.texts.append( Text(t['text'], vec2(t['pos']), t['follow_camera']) )
     
     def blit(self, text: str, pos: vec2):
-        chars = 'abcdefghijklmnopqrstuvwxyz1234567890.,:;!?/ '
-        text = text.lower()
-        width = len(text)*4
-        surf = pygame.Surface((width, 5))
+        width = len(text)*6
+        surf = pygame.Surface((width, 7))
         surf.fill((0, 0, 0))
         surf.set_colorkey((0, 0, 0))
         i = 0
         for c in text:
             surf.blit(
-                self.ss.image_at([ chars.find(c)*3, 0, 3, 5 ], (0, 0, 0)),
+                self.ss.image_at([ (ord(c)-32)*5, 0, 5, 7], (0, 0, 0)),
                 (i, 0)
-                )
-            i += 4
+            )
+            i += 6
         self.gm.screen.blit(surf, pos)
     
     def update(self):

@@ -29,6 +29,7 @@ class DiceGame:
             'type':pygame.mixer.Sound('sfx/type.wav'),
             'reset':pygame.mixer.Sound('sfx/reset.wav'),
             'win':pygame.mixer.Sound('sfx/win.wav'),
+            'invalid':pygame.mixer.Sound('sfx/invalid.wav'),
         }
         self.sounds['pink'].play(-1)
 
@@ -49,9 +50,6 @@ class DiceGame:
         self.isometric.load(f'levels/{self.lvl_id}.png')
         self.die.layout = DieLayout.fromlist(data['die_layout'])
         self.text_manager.load(data['texts'])
-
-        if self.lvl_id:
-            self.sounds['win'].play()
     
     def update(self):
         self.text_manager.update()
@@ -65,7 +63,7 @@ class DiceGame:
         self.isometric.draw()
 
         self.text_manager.draw()
-        self.text_manager.blit(f'LEVEL:{self.lvl_id}', vec2(5,5))
+        self.text_manager.blit(f'LVL:{self.lvl_id}', vec2(5,5))
 
     def run(self):
         running = True
@@ -77,7 +75,7 @@ class DiceGame:
                     running = False
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_r or event.key == pygame.K_SPACE:
-                        self.isometric.load(f'levels/{self.lvl_id}.png')
+                        self.load(self.lvl_id)
                         self.sounds['reset'].play()
             
             self.update()

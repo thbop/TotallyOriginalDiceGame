@@ -7,6 +7,12 @@
                 "pos":[-30,-30],
                 "delay":6,
                 "follow_camera":false
+            },
+            {
+                "text":"GO TO THE RED",
+                "pos":[-30,-22],
+                "delay":6,
+                "follow_camera":false
             }
         ]
     },

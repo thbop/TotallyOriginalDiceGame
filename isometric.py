@@ -23,7 +23,28 @@ class Iso:
             )
     def project(self) -> vec2:
         return self.project_coord(self.position)
+
+
+class IsoParticle(Iso):
+    def __init__(self, position: vec3, velocity: vec3, lifetime: int):
+        super().__init__(position)
+        self.velocity = velocity
+        self.lifetime = lifetime
+        self.dead = False
     
+    def update(self):
+        if not self.dead:
+            self.position += self.velocity
+            self.lifetime -= 1
+            if not self.lifetime:
+                self.dead = True
+
+
+class IsoTextParticle(IsoParticle):
+    def __init__(self, text: str, position: vec3, velocity: vec3, lifetime: int):
+        super().__init__(position, velocity, lifetime)
+        self.text = text
+
 
 class IsoCamera(Iso):
     def __init__(self, gm, rect: pygame.Rect):
@@ -138,6 +159,11 @@ class IsoDie(Iso):
             if isinstance(iso, IsoBlock) and iso.position == sample:
                 return iso.ID
         return -1
+    
+    def move_complete(self, dice_number):
+        self.update_tex()
+        self.gm.sounds['step'].play()
+        self.gm.isometric.isos.append(IsoTextParticle(f'{dice_number}', self.position.copy(), vec3(.01,0,.2), 20))
 
     def move_x(self, dx, isos):
         sample = self.position + vec3(-1,0,-1)
@@ -145,18 +171,22 @@ class IsoDie(Iso):
         for s in range(abs(dx)):
             sample.x += step
             if self._check_collision(sample, isos) == 1:
+                self.gm.sounds['invalid'].play()
                 return
         
         end_collision = self._check_collision(sample, isos)
         if end_collision == -1:
+            self.gm.sounds['invalid'].play()
             return
         if end_collision == 3:
             self.gm.load(self.gm.lvl_id+1)
+            if self.gm.lvl_id:
+                self.gm.sounds['win'].play()
         
         self.position.x += dx
 
-        self.update_tex()
-        self.gm.sounds['step'].play()
+        self.move_complete(abs(dx))
+
     
     def move_y(self, dy, isos):
         sample = self.position + vec3(-1,0,-1)
@@ -171,11 +201,12 @@ class IsoDie(Iso):
             return
         if end_collision == 3:
             self.gm.load(self.gm.lvl_id+1)
+            if self.gm.lvl_id:
+                self.gm.sounds['win'].play()
         
         self.position.y += dy
 
-        self.update_tex()
-        self.gm.sounds['step'].play()
+        self.move_complete(abs(dy))
     
     def update(self, isos):
         tapped = pygame.key.get_just_pressed()
@@ -237,6 +268,15 @@ class Isometric:
     def update(self):
         sort_expr = lambda x: (x.project().y + x.position.z * ISO_Y_OFFSET)
         self.isos.sort(key=sort_expr)
+        deadIsos = []
+        for iso in self.isos:
+            if isinstance(iso, IsoParticle):
+                iso.update()
+                if iso.dead:
+                    deadIsos.append(iso)
+        
+        for iso in deadIsos:
+            self.isos.remove(iso)
     
     def draw(self):
         for iso in self.isos:
@@ -247,5 +287,8 @@ class Isometric:
 
                 if isinstance(iso, IsoDie):
                     iso.draw()
+                
+                if isinstance(iso, IsoTextParticle):
+                    self.gm.text_manager.blit(iso.text, iso.project() - self.gm.camera.rect.topleft)
                 
         

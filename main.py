@@ -55,7 +55,7 @@ class DiceGame:
 
         self.die: IsoDie
         self.isometric = Isometric(self)
-        self.load(0)
+        self.load(5)
         
 
         self.camera = IsoCamera(self, pygame.Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -64,11 +64,13 @@ class DiceGame:
         with open('levels/dat.json') as f:
             data = json.load(f)[lvl]
         
+        
         self.lvl_id = lvl
         self.isometric.load(f'levels/{self.lvl_id}.png')
         self.die.layout = DieLayout.fromlist(data['die_layout'])
         self.die.update_tex()
         self.text_manager.load(data['texts'])
+
     
     def reset(self):
         self.load(self.lvl_id)

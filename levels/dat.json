@@ -65,5 +65,34 @@
                 "follow_camera":false
             }
         ]
+    },
+    {
+        "die_layout":[0,2,2,2,2,2],
+        "texts":[
+            {
+                "text":"WELL... THAT'S IT FOLKS.",
+                "pos":[-30,-30],
+                "delay":6,
+                "follow_camera":false
+            },
+            {
+                "text":"YOU'VE DONE YOUR BEST...",
+                "pos":[-30,-22],
+                "delay":6,
+                "follow_camera":false
+            },
+            {
+                "text":"YOU ARE DONE!",
+                "pos":[150,100],
+                "delay":20,
+                "follow_camera":false
+            },
+            {
+                "text":"WHERE ARE YOU GOING?!?",
+                "pos":[-350,100],
+                "delay":20,
+                "follow_camera":false
+            }
+        ]
     }
 ]

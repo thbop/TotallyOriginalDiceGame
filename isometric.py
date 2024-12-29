@@ -68,10 +68,6 @@ class IsoCamera(Iso):
         self.rect.centerx += ( die_pos.x - self.rect.centerx ) / 10
         self.rect.centery += ( die_pos.y - self.rect.centery ) / 10
 
-
-
-
-
 class IsoBlock(Iso):
     def __init__(self, position: vec3, ID: int):
         super().__init__(position)

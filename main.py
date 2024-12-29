@@ -55,7 +55,7 @@ class DiceGame:
 
         self.die: IsoDie
         self.isometric = Isometric(self)
-        self.load(5)
+        self.load(0)
         
 
         self.camera = IsoCamera(self, pygame.Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT))

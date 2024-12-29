@@ -194,10 +194,12 @@ class IsoDie(Iso):
         for s in range(abs(dy)):
             sample.y += step
             if self._check_collision(sample, isos) == 1:
+                self.gm.sounds['invalid'].play()
                 return False
         
         end_collision = self._check_collision(sample, isos)
         if end_collision == -1:
+            self.gm.sounds['invalid'].play()
             return False
         if end_collision == 3:
             self.gm.load(self.gm.lvl_id+1)

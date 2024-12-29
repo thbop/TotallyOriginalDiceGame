@@ -94,5 +94,16 @@
                 "follow_camera":false
             }
         ]
+    },
+    {
+        "die_layout":[0,0,0,0,1,0],
+        "texts":[
+            {
+                "text":"YOU AREN'T SUPPOSED TO BE HERE!!!",
+                "pos":[-100,220],
+                "delay":6,
+                "follow_camera":false
+            }
+        ]
     }
 ]

@@ -85,6 +85,9 @@ class DieLayout:
         self.left = left
         self.front = front
         self.back = back
+    
+    def __repr__(self):
+        return f'DieLayout(top: {self.top}, bottom: {self.bottom}, right: {self.right}, left: {self.left}, front: {self.front}, back: {self.back})'
 
     def copy(self, existing):
         return DieLayout(existing.top, existing.bottom, existing.right, existing.left, existing.front, existing.back)
@@ -172,12 +175,12 @@ class IsoDie(Iso):
             sample.x += step
             if self._check_collision(sample, isos) == 1:
                 self.gm.sounds['invalid'].play()
-                return
+                return False
         
         end_collision = self._check_collision(sample, isos)
         if end_collision == -1:
             self.gm.sounds['invalid'].play()
-            return
+            return False
         if end_collision == 3:
             self.gm.load(self.gm.lvl_id+1)
             if self.gm.lvl_id:
@@ -186,6 +189,7 @@ class IsoDie(Iso):
         self.position.x += dx
 
         self.move_complete(abs(dx))
+        return True
 
     
     def move_y(self, dy, isos):
@@ -194,11 +198,11 @@ class IsoDie(Iso):
         for s in range(abs(dy)):
             sample.y += step
             if self._check_collision(sample, isos) == 1:
-                return
+                return False
         
         end_collision = self._check_collision(sample, isos)
         if end_collision == -1:
-            return
+            return False
         if end_collision == 3:
             self.gm.load(self.gm.lvl_id+1)
             if self.gm.lvl_id:
@@ -207,21 +211,22 @@ class IsoDie(Iso):
         self.position.y += dy
 
         self.move_complete(abs(dy))
+        return True
     
     def update(self, isos):
         tapped = pygame.key.get_just_pressed()
         if tapped[pygame.K_d] or tapped[pygame.K_RIGHT]:
             self.layout.roll_right()
-            self.move_x(self.layout.bottom+1, isos)
+            if not self.move_x(self.layout.bottom+1, isos): self.layout.roll_left()
         if tapped[pygame.K_a] or tapped[pygame.K_LEFT]:
             self.layout.roll_left()
-            self.move_x(-(self.layout.bottom+1), isos)
+            if not self.move_x(-(self.layout.bottom+1), isos): self.layout.roll_right()
         if tapped[pygame.K_s] or tapped[pygame.K_DOWN]:
             self.layout.roll_front()
-            self.move_y(self.layout.bottom+1, isos)
+            if not self.move_y(self.layout.bottom+1, isos): self.layout.roll_back()
         if tapped[pygame.K_w] or tapped[pygame.K_UP]:
             self.layout.roll_back()
-            self.move_y(-(self.layout.bottom+1), isos)
+            if not self.move_y(-(self.layout.bottom+1), isos): self.layout.roll_front()
         
 
 

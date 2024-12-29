@@ -12,8 +12,6 @@ from isometric import *
 pygame.init()
 pygame.mixer.init()
 
-
-
 # Base class
 class DiceGame:
     def __init__(self):
@@ -37,7 +35,7 @@ class DiceGame:
 
         self.die: IsoDie
         self.isometric = Isometric(self)
-        self.load(0)
+        self.load(4)
         
 
         self.camera = IsoCamera(self, pygame.Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -49,12 +47,14 @@ class DiceGame:
         self.lvl_id = lvl
         self.isometric.load(f'levels/{self.lvl_id}.png')
         self.die.layout = DieLayout.fromlist(data['die_layout'])
+        self.die.update_tex()
         self.text_manager.load(data['texts'])
     
     def update(self):
         self.text_manager.update()
         self.isometric.update()
         self.die.update(self.isometric.isos)
+        # print(self.die.layout)
         self.camera.update()
 
     def draw(self):

@@ -54,5 +54,16 @@
                 "follow_camera":false
             }
         ]
+    },
+    {
+        "die_layout":[0,1,2,0,1,2],
+        "texts":[
+            {
+                "text":"INTRODUCING: THREE",
+                "pos":[-30,-30],
+                "delay":6,
+                "follow_camera":false
+            }
+        ]
     }
 ]

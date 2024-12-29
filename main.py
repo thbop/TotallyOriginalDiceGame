@@ -6,7 +6,7 @@ if sys.platform == "emscripten":
     import js
     user_agent = js.window.navigator.userAgent
     # Simple check for mobile user agents
-    mobile = any(mobile_str in user_agent for mobile_str in ["Mobi", "Android", "iPhone"])
+    mobile = any(mobile_str in user_agent for mobile_str in ["Mobi", "Android", "iPhone", "iPad"])
 
 import json
 import asyncio

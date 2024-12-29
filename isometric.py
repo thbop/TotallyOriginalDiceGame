@@ -213,20 +213,18 @@ class IsoDie(Iso):
         self.move_complete(abs(dy))
         return True
     
-    def update(self, isos):
-        tapped = pygame.key.get_just_pressed()
-        if tapped[pygame.K_d] or tapped[pygame.K_RIGHT]:
-            self.layout.roll_right()
-            if not self.move_x(self.layout.bottom+1, isos): self.layout.roll_left()
-        if tapped[pygame.K_a] or tapped[pygame.K_LEFT]:
+    def move_right(self):
+        self.layout.roll_right()
+        if not self.move_x(self.layout.bottom+1, self.gm.isometric.isos): self.layout.roll_left()
+    def move_left(self):
             self.layout.roll_left()
-            if not self.move_x(-(self.layout.bottom+1), isos): self.layout.roll_right()
-        if tapped[pygame.K_s] or tapped[pygame.K_DOWN]:
+            if not self.move_x(-(self.layout.bottom+1), self.gm.isometric.isos): self.layout.roll_right()
+    def move_front(self):
             self.layout.roll_front()
-            if not self.move_y(self.layout.bottom+1, isos): self.layout.roll_back()
-        if tapped[pygame.K_w] or tapped[pygame.K_UP]:
+            if not self.move_y(self.layout.bottom+1, self.gm.isometric.isos): self.layout.roll_back()
+    def move_back(self):
             self.layout.roll_back()
-            if not self.move_y(-(self.layout.bottom+1), isos): self.layout.roll_front()
+            if not self.move_y(-(self.layout.bottom+1), self.gm.isometric.isos): self.layout.roll_front()
         
 
 

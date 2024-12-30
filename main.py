@@ -15,7 +15,7 @@ from pygame.math import Vector2 as vec2
 from constants import *
 from text import *
 from isometric import *
-
+from backgrounds import *
 
 
 # Initialize pygame
@@ -31,9 +31,16 @@ class DiceGame:
         self.window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
         self.screen = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
 
+        self.backgrounds = {
+            'classic': BackgroundColor(self, (12,13,20)),
+            'stars': BackgroundStars(self)
+        }
+        self.current_background = 'classic'
+
         self.sounds = {
             'step':pygame.mixer.Sound('sfx/step.wav'),
             'pink':pygame.mixer.Sound('sfx/pink.ogg'),
+            'stars':pygame.mixer.Sound('sfx/stars.ogg'),
             'type':pygame.mixer.Sound('sfx/type.wav'),
             'reset':pygame.mixer.Sound('sfx/reset.wav'),
             'win':pygame.mixer.Sound('sfx/win.wav'),
@@ -56,15 +63,22 @@ class DiceGame:
         self.isometric = Isometric(self)
         self.load(0)
         
-
         self.camera = IsoCamera(self, pygame.Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT))
     
-    def load(self, lvl):
+    def load(self, lvl, reset_sfx=True):
         with open('levels/dat.json') as f:
             data = json.load(f)[lvl]
         
         
         self.lvl_id = lvl
+        self.current_background = data['background']
+
+        if reset_sfx:
+            pygame.mixer.stop()
+            if data['music']:
+                for m in data['music']:
+                    self.sounds[m].play(-1)
+
         self.isometric.load(f'levels/{self.lvl_id}.png')
         self.die.layout = DieLayout.fromlist(data['die_layout'])
         self.die.update_tex()
@@ -72,7 +86,7 @@ class DiceGame:
 
     
     def reset(self):
-        self.load(self.lvl_id)
+        self.load(self.lvl_id, False)
         self.sounds['reset'].play()
     
     def process_touch_controls(self, mouse_pos: vec2):
@@ -92,6 +106,7 @@ class DiceGame:
         self.isometric.update()
         # print(self.die.layout)
         self.camera.update()
+        self.backgrounds[self.current_background].update()
     
     def draw_move_options(self):
         self.screen.blit(pygame.transform.scale(self.die.faces[self.die.layout.back], (MV_OP_SIZE, MV_OP_SIZE)), (SCREEN_WIDTH-MV_OP_SIZE-MV_OP_PADDING, MV_OP_PADDING))
@@ -104,7 +119,7 @@ class DiceGame:
         pygame.draw.rect(self.screen, (255,255,255), [SCREEN_WIDTH-(MV_OP_SIZE+MV_OP_PADDING)*2-1, MV_OP_SIZE+MV_OP_PADDING+1, MV_OP_SIZE+2, MV_OP_SIZE+2],1)
 
     def draw(self):
-        self.screen.fill((12,13,20)) # Clear screen
+        self.backgrounds[self.current_background].draw()
 
         self.isometric.draw()
 

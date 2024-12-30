@@ -1,6 +1,8 @@
 [
     {
         "die_layout":[0,0,0,0,0,0],
+        "background":"classic",
+        "music":["pink"],
         "texts":[
             {
                 "text":"WASD/ARROW KEYS TO MOVE",
@@ -18,6 +20,8 @@
     },
     {
         "die_layout":[1,1,1,1,1,1],
+        "background":"classic",
+        "music":["pink"],
         "texts":[
             {
                 "text":"MOVE THE NUMBER OF SPACES",
@@ -35,6 +39,8 @@
     },
     {
         "die_layout":[0,1,0,1,0,1],
+        "background":"classic",
+        "music":["pink"],
         "texts":[
             {
                 "text":"TWOS AND ONES!!!",
@@ -46,6 +52,8 @@
     },
     {
         "die_layout":[0,1,0,1,0,1],
+        "background":"classic",
+        "music":["pink"],
         "texts":[
             {
                 "text":"R OR SPACE TO RESET",
@@ -57,6 +65,8 @@
     },
     {
         "die_layout":[0,1,2,0,1,2],
+        "background":"classic",
+        "music":["pink"],
         "texts":[
             {
                 "text":"INTRODUCING: THREE",
@@ -68,6 +78,8 @@
     },
     {
         "die_layout":[0,2,2,2,2,2],
+        "background":"classic",
+        "music":["pink"],
         "texts":[
             {
                 "text":"WELL... THAT'S IT FOLKS.",
@@ -97,6 +109,8 @@
     },
     {
         "die_layout":[0,0,0,0,1,0],
+        "background":"classic",
+        "music":["pink"],
         "texts":[
             {
                 "text":"YOU AREN'T SUPPOSED TO BE HERE!!!",
@@ -107,17 +121,32 @@
         ]
     },
     {
-        "die_layout":[0,0,0,0,0,0],
+        "die_layout":[1,1,0,1,1,0],
+        "background":"stars",
+        "music":["pink","stars"],
         "texts":[
             {
-                "text":"THANKS FOR GETTING THIS FAR!!",
+                "text":"YOU'RE NOT EVEN GOING THE RIGHT WAY!!",
+                "pos":[-350,250],
+                "delay":0,
+                "follow_camera":false
+            }
+        ]
+    },
+    {
+        "die_layout":[0,0,0,0,0,0],
+        "background":"stars",
+        "music":["pink","stars"],
+        "texts":[
+            {
+                "text":"THE CHILL ZONE.",
                 "pos":[-30,-30],
                 "delay":6,
                 "follow_camera":false
             },
             {
-                "text":"THIS IS ALL I HAVE AT THE MOMENT",
-                "pos":[-30,-22],
+                "text":"THIS GAME IS IN DEVELOPMENT...",
+                "pos":[-100,50],
                 "delay":6,
                 "follow_camera":false
             }

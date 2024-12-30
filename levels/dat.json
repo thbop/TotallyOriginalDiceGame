@@ -105,5 +105,22 @@
                 "follow_camera":false
             }
         ]
+    },
+    {
+        "die_layout":[0,0,0,0,0,0],
+        "texts":[
+            {
+                "text":"THANKS FOR GETTING THIS FAR!!",
+                "pos":[-30,-30],
+                "delay":6,
+                "follow_camera":false
+            },
+            {
+                "text":"THIS IS ALL I HAVE AT THE MOMENT",
+                "pos":[-30,-22],
+                "delay":6,
+                "follow_camera":false
+            }
+        ]
     }
 ]

@@ -5,7 +5,6 @@ if sys.platform == "emscripten":
     platform.window.canvas.style.imageRendering = "pixelated"
     import js
     user_agent = js.window.navigator.userAgent
-    # Simple check for mobile user agents
     mobile = any(mobile_str in user_agent for mobile_str in ["Mobi", "Android", "iPhone", "iPad"])
 
 import json
@@ -93,6 +92,16 @@ class DiceGame:
         self.isometric.update()
         # print(self.die.layout)
         self.camera.update()
+    
+    def draw_move_options(self):
+        self.screen.blit(pygame.transform.scale(self.die.faces[self.die.layout.back], (MV_OP_SIZE, MV_OP_SIZE)), (SCREEN_WIDTH-MV_OP_SIZE-MV_OP_PADDING, MV_OP_PADDING))
+        pygame.draw.rect(self.screen, (255,255,255), [SCREEN_WIDTH-MV_OP_SIZE-MV_OP_PADDING-1, 1, MV_OP_SIZE+2, MV_OP_SIZE+2],1)
+        self.screen.blit(pygame.transform.scale(self.die.faces[self.die.layout.left], (MV_OP_SIZE, MV_OP_SIZE)), (SCREEN_WIDTH-(MV_OP_SIZE+MV_OP_PADDING)*2, MV_OP_PADDING))
+        pygame.draw.rect(self.screen, (255,255,255), [SCREEN_WIDTH-(MV_OP_SIZE+MV_OP_PADDING)*2-1, 1, MV_OP_SIZE+2, MV_OP_SIZE+2],1)
+        self.screen.blit(pygame.transform.scale(self.die.faces[self.die.layout.right], (MV_OP_SIZE, MV_OP_SIZE)), (SCREEN_WIDTH-MV_OP_SIZE-MV_OP_PADDING, MV_OP_SIZE+MV_OP_PADDING*2))
+        pygame.draw.rect(self.screen, (255,255,255), [SCREEN_WIDTH-MV_OP_SIZE-MV_OP_PADDING-1, MV_OP_SIZE+MV_OP_PADDING+1, MV_OP_SIZE+2, MV_OP_SIZE+2],1)
+        self.screen.blit(pygame.transform.scale(self.die.faces[self.die.layout.front], (MV_OP_SIZE, MV_OP_SIZE)), (SCREEN_WIDTH-(MV_OP_SIZE+MV_OP_PADDING)*2, MV_OP_SIZE+MV_OP_PADDING*2))
+        pygame.draw.rect(self.screen, (255,255,255), [SCREEN_WIDTH-(MV_OP_SIZE+MV_OP_PADDING)*2-1, MV_OP_SIZE+MV_OP_PADDING+1, MV_OP_SIZE+2, MV_OP_SIZE+2],1)
 
     def draw(self):
         self.screen.fill((12,13,20)) # Clear screen
@@ -107,6 +116,8 @@ class DiceGame:
                 pygame.draw.rect(self.screen, (255,255,255), rect, 1)
             
             self.text_manager.blit('R', vec2(self.touch_control_rects[4].center)-vec2(3,4))
+        
+        self.draw_move_options()
 
 
 

@@ -95,7 +95,7 @@
             },
             {
                 "text":"YOU ARE DONE!",
-                "pos":[150,100],
+                "pos":[100,100],
                 "delay":20,
                 "follow_camera":false
             },
@@ -134,19 +134,76 @@
         ]
     },
     {
-        "die_layout":[0,0,0,0,0,0],
+        "die_layout":[2,2,2,2,0,2],
         "background":"stars",
         "music":["pink","stars"],
         "texts":[
             {
-                "text":"THE CHILL ZONE.",
+                "text":"STOP! STOP! STOP!!!",
                 "pos":[-30,-30],
                 "delay":6,
                 "follow_camera":false
             },
             {
-                "text":"THIS GAME IS IN DEVELOPMENT...",
-                "pos":[-100,50],
+                "text":"THESE LEVELS ARE STILL IN DEVELOPMENT!!!",
+                "pos":[-30,-22],
+                "delay":6,
+                "follow_camera":false
+            }
+        ]
+    },
+    {
+        "die_layout":[2,1,0,0,1,2],
+        "background":"stars",
+        "music":["pink","stars"],
+        "texts":[
+            {
+                "text":"I TOLD YOU NOT TO GO FURTHER",
+                "pos":[-30,-30],
+                "delay":6,
+                "follow_camera":false
+            },
+            {
+                "text":"BUT...    YOU DIDN'T LISTEN!",
+                "pos":[-30,-22],
+                "delay":10,
+                "follow_camera":false
+            }
+        ]
+    },
+    {
+        "die_layout":[5,5,5,5,0,5],
+        "background":"stars",
+        "music":["pink"],
+        "texts":[
+            {
+                "text":"YOU BROUGHT THIS UPON",
+                "pos":[-20,-30],
+                "delay":6,
+                "follow_camera":false
+            },
+            {
+                "text":"          YOURSELF...",
+                "pos":[-20,-22],
+                "delay":7,
+                "follow_camera":false
+            }
+        ]
+    },
+    {
+        "die_layout":[1,0,1,0,1,0],
+        "background":"classic",
+        "music":["pink"],
+        "texts":[
+            {
+                "text":"WELCOME TO THE CHILL ZONE",
+                "pos":[-65,-30],
+                "delay":6,
+                "follow_camera":false
+            },
+            {
+                "text":"THIS GAME IS STILL IN BETA",
+                "pos":[-65,-22],
                 "delay":6,
                 "follow_camera":false
             }

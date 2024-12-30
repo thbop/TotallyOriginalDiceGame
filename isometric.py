@@ -72,6 +72,30 @@ class IsoBlock(Iso):
     def __init__(self, position: vec3, ID: int):
         super().__init__(position)
         self.ID = ID
+    
+
+class IsoTimedBlock(IsoBlock):
+    def __init__(self, gm, position, ID, time=60):
+        super().__init__(position, ID)
+        self.gm = gm
+        self.time = time
+        self.tick = time
+        self.stepped_on = False
+    
+    
+    def update(self):
+        if self.ID == 4 and self.stepped_on:
+            self.tick -= 1
+            if not self.tick:
+                self.ID = 5 # Become void block
+                self.stepped_on = False
+                self.gm.sounds['blip'].play()
+        
+        elif self.ID == 5:
+            self.tick += 1
+            if self.tick == self.time:
+                self.ID = 4 # Become timer block
+                self.gm.sounds['blip'].play()
 
 class DieLayout:
     def __init__(self, top, bottom, right, left, front, back):
@@ -118,8 +142,10 @@ class DieLayout:
 
 class IsoDie(Iso):
     def __init__(self, gm, position: vec3, layout: DieLayout):
-        self.gm = gm
         super().__init__(position)
+        self.gm = gm
+        self.default_position = position.copy()
+        self.sample_offset = vec3(-1,0,-1)
         self.layout = layout
 
 
@@ -155,59 +181,64 @@ class IsoDie(Iso):
     def _check_collision(self, sample: vec3, isos):
         for iso in isos:
             if isinstance(iso, IsoBlock) and iso.position == sample:
-                return iso.ID
-        return -1
+                return iso
+        return None
     
-    def move_complete(self, dice_number):
+    def _move_process(self, iso):
+        if iso == None or iso.ID == 5: # Void tiles
+            self.gm.sounds['invalid'].play()
+            return False
+        elif iso.ID == 4: # White tile
+            iso.stepped_on = True
+        elif iso.ID == 3: # Red tile
+            self.gm.load(self.gm.lvl_id+1)
+            if self.gm.lvl_id:
+                self.gm.sounds['win'].play()
+        
+        return True
+    
+    def _move_complete(self, dice_number):
         self.update_tex()
         self.gm.sounds['step'].play()
         self.gm.isometric.isos.append(IsoTextParticle(f'{dice_number}', self.position.copy(), vec3(.01,0,.2), 20))
 
     def move_x(self, dx, isos):
-        sample = self.position + vec3(-1,0,-1)
+        sample = self.position + self.sample_offset
         step = copysign(1, dx)
         for s in range(abs(dx)):
             sample.x += step
-            if self._check_collision(sample, isos) == 1:
+            step_collision = self._check_collision(sample, isos)
+            if step_collision and step_collision.ID == 1:
                 self.gm.sounds['invalid'].play()
                 return False
         
         end_collision = self._check_collision(sample, isos)
-        if end_collision == -1:
-            self.gm.sounds['invalid'].play()
+        if not self._move_process(end_collision):
             return False
-        if end_collision == 3:
-            self.gm.load(self.gm.lvl_id+1)
-            if self.gm.lvl_id:
-                self.gm.sounds['win'].play()
         
         self.position.x += dx
 
-        self.move_complete(abs(dx))
+        self._move_complete(abs(dx))
         return True
 
     
     def move_y(self, dy, isos):
-        sample = self.position + vec3(-1,0,-1)
+        sample = self.position + self.sample_offset
         step = copysign(1, dy)
         for s in range(abs(dy)):
             sample.y += step
-            if self._check_collision(sample, isos) == 1:
+            step_collision = self._check_collision(sample, isos)
+            if step_collision and step_collision.ID == 1:
                 self.gm.sounds['invalid'].play()
                 return False
         
         end_collision = self._check_collision(sample, isos)
-        if end_collision == -1:
-            self.gm.sounds['invalid'].play()
+        if not self._move_process(end_collision):
             return False
-        if end_collision == 3:
-            self.gm.load(self.gm.lvl_id+1)
-            if self.gm.lvl_id:
-                self.gm.sounds['win'].play()
         
         self.position.y += dy
 
-        self.move_complete(abs(dy))
+        self._move_complete(abs(dy))
         return True
     
     def move_right(self):
@@ -222,9 +253,10 @@ class IsoDie(Iso):
     def move_back(self):
             self.layout.roll_back()
             if not self.move_y(-(self.layout.bottom+1), self.gm.isometric.isos): self.layout.roll_front()
-        
-
-
+    
+    def update(self):
+        if self._check_collision(self.position+self.sample_offset, self.gm.isometric.isos).ID == 5:
+            self.gm.reset('invalid')
 
     def draw(self):
         self.gm.screen.blit(self.tex, self.project() - self.gm.camera.rect.topleft + vec2(-4,3))
@@ -237,10 +269,12 @@ class Isometric:
         block_ss = spritesheet('img/blocks.png')
         self.block_textures = block_ss.images_at(
             [
-                [0,0,23,22],  # Blue
-                [23,0,23,22], # Orange
-                [46,0,23,22], # Green/Start
-                [69,0,23,22], # Red/End
+                [0,0,23,22],   # Blue
+                [23,0,23,22],  # Orange
+                [46,0,23,22],  # Green/Start
+                [69,0,23,22],  # Red/End
+                [92,0,23,22],  # White/Timed
+                [115,0,23,22], # Empty
             ],
             (0,0,0)
         )
@@ -262,7 +296,8 @@ class Isometric:
                     # Regular die layout DieLayout(0,5,1,4,2,3)
                     self.gm.die = IsoDie(self.gm, vec3(i+1,j,1), DieLayout(0,0,0,0,0,0))
                     self.isos.append(self.gm.die)
-
+                elif color == (0x64,0x64,0x64):
+                    self.isos.append(IsoTimedBlock(self.gm, vec3(i,j,0), 4))
 
 
     def update(self):
@@ -270,6 +305,8 @@ class Isometric:
         self.isos.sort(key=sort_expr)
         deadIsos = []
         for iso in self.isos:
+            if isinstance(iso, IsoTimedBlock) or isinstance(iso, IsoDie):
+                iso.update()
             if isinstance(iso, IsoParticle):
                 iso.update()
                 if iso.dead:

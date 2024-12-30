@@ -45,6 +45,7 @@ class DiceGame:
             'reset':pygame.mixer.Sound('sfx/reset.wav'),
             'win':pygame.mixer.Sound('sfx/win.wav'),
             'invalid':pygame.mixer.Sound('sfx/invalid.wav'),
+            'blip':pygame.mixer.Sound('sfx/blip.wav'),
         }
         self.sounds['pink'].play(-1)
 
@@ -65,7 +66,7 @@ class DiceGame:
         
         self.camera = IsoCamera(self, pygame.Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT))
     
-    def load(self, lvl, reset_sfx=True):
+    def load(self, lvl):
         with open('levels/dat.json') as f:
             data = json.load(f)[lvl]
         
@@ -73,11 +74,10 @@ class DiceGame:
         self.lvl_id = lvl
         self.current_background = data['background']
 
-        if reset_sfx:
-            pygame.mixer.stop()
-            if data['music']:
-                for m in data['music']:
-                    self.sounds[m].play(-1)
+        pygame.mixer.stop()
+        if data['music']:
+            for m in data['music']:
+                self.sounds[m].play(-1)
 
         self.isometric.load(f'levels/{self.lvl_id}.png')
         self.die.layout = DieLayout.fromlist(data['die_layout'])
@@ -85,9 +85,13 @@ class DiceGame:
         self.text_manager.load(data['texts'])
 
     
-    def reset(self):
-        self.load(self.lvl_id, False)
-        self.sounds['reset'].play()
+    def reset(self, sfx='reset'):
+        with open('levels/dat.json') as f:
+            data = json.load(f)[self.lvl_id]
+        self.die.layout = DieLayout.fromlist(data['die_layout'])
+        self.die.update_tex()
+        self.die.position = self.die.default_position.copy()
+        self.sounds[sfx].play()
     
     def process_touch_controls(self, mouse_pos: vec2):
         if self.touch_control_rects[0].collidepoint(mouse_pos):
